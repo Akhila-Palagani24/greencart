@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🛒 GreenCart – Fresh Grocery E-Commerce App
 
 A full-featured grocery e-commerce web app built with **React 18**, **Tailwind CSS 3**, and **React Router v6**.
@@ -133,3 +134,6 @@ useEffect(() => {
     .then(data => setProducts(data));
 }, []);
 ```
+=======
+# greencart
+>>>>>>> ee9da57d82034c0602bf9dd0d03c1da55228f400
