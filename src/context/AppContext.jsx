@@ -18,7 +18,7 @@ const saveToStorage = (key, value) => {
   try {
     localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    // ignore write errors (e.g. storage full / privacy mode)
+    // ignore write errors
   }
 };
 
@@ -39,16 +39,12 @@ const cartReducer = (state, action) => {
     case "REMOVE":
       return state.filter((item) => item.id !== action.id);
     case "UPDATE_QTY":
-      if (action.qty <= 0) {
-        return state.filter((item) => item.id !== action.id);
-      }
+      if (action.qty <= 0) return state.filter((item) => item.id !== action.id);
       return state.map((item) =>
         item.id === action.id ? { ...item, qty: action.qty } : item
       );
     case "CLEAR":
       return [];
-    case "HYDRATE":
-      return action.payload || [];
     default:
       return state;
   }
@@ -61,8 +57,6 @@ const wishlistReducer = (state, action) => {
       const exists = state.includes(action.id);
       return exists ? state.filter((id) => id !== action.id) : [...state, action.id];
     }
-    case "HYDRATE":
-      return action.payload || [];
     default:
       return state;
   }
@@ -85,24 +79,23 @@ export const AppProvider = ({ children }) => {
   // ── Search & category filter ──
   const [searchQuery, setSearchQuery] = useState("");
 
-  // ── Auth (mock) ──
+  // ── Auth ──
   const [user, setUser] = useState(() => loadFromStorage("greencart_user", null));
-  const [orders, setOrders] = useState(() =>
-  loadFromStorage("greencart_orders", [])
-);
 
-  // ── Persist cart & wishlist ──
-  useEffect(() => {
-    saveToStorage("greencart_cart", cart);
-  }, [cart]);
+  // ── Orders ── (real, persisted)
+  const [orders, setOrders] = useState(() => loadFromStorage("greencart_orders", []));
 
-  useEffect(() => {
-    saveToStorage("greencart_wishlist", wishlist);
-  }, [wishlist]);
+  // ── Saved addresses ──
+  const [savedAddresses, setSavedAddresses] = useState(() =>
+    loadFromStorage("greencart_addresses", [])
+  );
 
-  useEffect(() => {
-    saveToStorage("greencart_user", user);
-  }, [user]);
+  // ── Persist everything ──
+  useEffect(() => { saveToStorage("greencart_cart", cart); }, [cart]);
+  useEffect(() => { saveToStorage("greencart_wishlist", wishlist); }, [wishlist]);
+  useEffect(() => { saveToStorage("greencart_user", user); }, [user]);
+  useEffect(() => { saveToStorage("greencart_orders", orders); }, [orders]);
+  useEffect(() => { saveToStorage("greencart_addresses", savedAddresses); }, [savedAddresses]);
 
   // ── Cart actions ──
   const addToCart = useCallback((product, qty = 1) => {
@@ -115,9 +108,7 @@ export const AppProvider = ({ children }) => {
 
   const removeFromCart = useCallback((id, name) => {
     dispatchCart({ type: "REMOVE", id });
-    if (name) {
-      toast(`${name} removed from cart`, { icon: "🗑️" });
-    }
+    if (name) toast(`${name} removed from cart`, { icon: "🗑️" });
   }, []);
 
   const updateQty = useCallback((id, qty) => {
@@ -132,14 +123,14 @@ export const AppProvider = ({ children }) => {
   const toggleWishlist = useCallback((id, name) => {
     dispatchWishlist({ type: "TOGGLE", id });
     const isCurrentlyIn = wishlist.includes(id);
-    toast(isCurrentlyIn ? `Removed from wishlist` : `${name || "Item"} added to wishlist`, {
+    toast(isCurrentlyIn ? "Removed from wishlist" : `${name || "Item"} added to wishlist`, {
       icon: isCurrentlyIn ? "💔" : "❤️",
     });
   }, [wishlist]);
 
   const isInWishlist = useCallback((id) => wishlist.includes(id), [wishlist]);
 
-  // ── Auth actions (mock) ──
+  // ── Auth actions ──
   const login = useCallback((email, name) => {
     const userData = { email, name: name || email.split("@")[0], joinedAt: new Date().toISOString() };
     setUser(userData);
@@ -159,109 +150,104 @@ export const AppProvider = ({ children }) => {
     toast("Logged out successfully", { icon: "👋" });
   }, []);
 
+  // ── Order actions ──
+  const placeOrder = useCallback(({ address, paymentMethod, upiId, cartItems, subtotal, deliveryFee, taxAmount, total, savings }) => {
+    const newOrder = {
+      id: `GC-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`,
+      date: new Date().toISOString(),
+      status: "Confirmed",
+      items: cartItems.map((i) => ({
+        id: i.id,
+        name: i.name,
+        image: i.image,
+        price: i.price,
+        qty: i.qty,
+        unit: i.unit,
+      })),
+      address,
+      paymentMethod,
+      upiId: paymentMethod === "upi" ? upiId : null,
+      subtotal,
+      deliveryFee,
+      taxAmount,
+      total,
+      savings,
+      itemCount: cartItems.reduce((s, i) => s + i.qty, 0),
+    };
+    setOrders((prev) => [newOrder, ...prev]);
+    // Save address if it's new
+    if (address && address.line1) {
+      setSavedAddresses((prev) => {
+        const exists = prev.some(
+          (a) => a.line1 === address.line1 && a.pincode === address.pincode
+        );
+        if (!exists) {
+          return [{ ...address, id: Date.now() }, ...prev].slice(0, 5);
+        }
+        return prev;
+      });
+    }
+    clearCart();
+    toast.success("Order placed successfully!", { icon: "🎉" });
+    return newOrder;
+  }, [clearCart]);
+
+  const deleteAddress = useCallback((id) => {
+    setSavedAddresses((prev) => prev.filter((a) => a.id !== id));
+    toast("Address removed", { icon: "🗑️" });
+  }, []);
+
   // ── Derived cart values ──
   const cartCount = useMemo(() => cart.reduce((sum, item) => sum + item.qty, 0), [cart]);
-
-  const cartSubtotal = useMemo(
-    () => cart.reduce((sum, item) => sum + item.price * item.qty, 0),
-    [cart]
-  );
-
-  const cartOriginalTotal = useMemo(
-    () => cart.reduce((sum, item) => sum + (item.originalPrice || item.price) * item.qty, 0),
-    [cart]
-  );
-
+  const cartSubtotal = useMemo(() => cart.reduce((sum, item) => sum + item.price * item.qty, 0), [cart]);
+  const cartOriginalTotal = useMemo(() => cart.reduce((sum, item) => sum + (item.originalPrice || item.price) * item.qty, 0), [cart]);
   const cartSavings = useMemo(() => cartOriginalTotal - cartSubtotal, [cartOriginalTotal, cartSubtotal]);
-
-  const deliveryFee = useMemo(
-    () => (cartSubtotal >= DELIVERY_FREE_THRESHOLD || cartSubtotal === 0 ? 0 : DELIVERY_FEE),
-    [cartSubtotal]
-  );
-
+  const deliveryFee = useMemo(() => (cartSubtotal >= DELIVERY_FREE_THRESHOLD || cartSubtotal === 0 ? 0 : DELIVERY_FEE), [cartSubtotal]);
   const taxAmount = useMemo(() => Math.round(cartSubtotal * TAX_RATE), [cartSubtotal]);
+  const cartTotal = useMemo(() => cartSubtotal + deliveryFee + taxAmount, [cartSubtotal, deliveryFee, taxAmount]);
+  const amountToFreeDelivery = useMemo(() => Math.max(0, DELIVERY_FREE_THRESHOLD - cartSubtotal), [cartSubtotal]);
 
-  const cartTotal = useMemo(
-    () => cartSubtotal + deliveryFee + taxAmount,
-    [cartSubtotal, deliveryFee, taxAmount]
-  );
+  // ── Product helpers ──
+  const getFilteredProducts = useCallback(({ category, search, sort } = {}) => {
+    let result = [...PRODUCTS];
+    if (category && category !== "all") result = result.filter((p) => p.category === category);
+    const query = (search ?? searchQuery)?.trim().toLowerCase();
+    if (query) {
+      result = result.filter(
+        (p) =>
+          p.name.toLowerCase().includes(query) ||
+          p.category.toLowerCase().includes(query) ||
+          p.description.toLowerCase().includes(query) ||
+          p.tags?.some((t) => t.toLowerCase().includes(query))
+      );
+    }
+    switch (sort) {
+      case "price-low": result.sort((a, b) => a.price - b.price); break;
+      case "price-high": result.sort((a, b) => b.price - a.price); break;
+      case "rating": result.sort((a, b) => b.rating - a.rating); break;
+      case "name": result.sort((a, b) => a.name.localeCompare(b.name)); break;
+      default: break;
+    }
+    return result;
+  }, [searchQuery]);
 
-  const amountToFreeDelivery = useMemo(
-    () => Math.max(0, DELIVERY_FREE_THRESHOLD - cartSubtotal),
-    [cartSubtotal]
-  );
-
-  // ── Product filtering / searching ──
-  const getFilteredProducts = useCallback(
-    ({ category, search, sort } = {}) => {
-      let result = [...PRODUCTS];
-
-      if (category && category !== "all") {
-        result = result.filter((p) => p.category === category);
-      }
-
-      const query = (search ?? searchQuery)?.trim().toLowerCase();
-      if (query) {
-        result = result.filter(
-          (p) =>
-            p.name.toLowerCase().includes(query) ||
-            p.category.toLowerCase().includes(query) ||
-            p.description.toLowerCase().includes(query) ||
-            p.tags?.some((t) => t.toLowerCase().includes(query))
-        );
-      }
-
-      switch (sort) {
-        case "price-low":
-          result.sort((a, b) => a.price - b.price);
-          break;
-        case "price-high":
-          result.sort((a, b) => b.price - a.price);
-          break;
-        case "rating":
-          result.sort((a, b) => b.rating - a.rating);
-          break;
-        case "name":
-          result.sort((a, b) => a.name.localeCompare(b.name));
-          break;
-        default:
-          break;
-      }
-
-      return result;
-    },
-    [searchQuery]
-  );
-
-  const getProductById = useCallback((id) => {
-    return PRODUCTS.find((p) => p.id === Number(id));
-  }, []);
-
+  const getProductById = useCallback((id) => PRODUCTS.find((p) => p.id === Number(id)), []);
   const getRelatedProducts = useCallback((product, limit = 4) => {
     if (!product) return [];
-    return PRODUCTS.filter(
-      (p) => p.category === product.category && p.id !== product.id
-    ).slice(0, limit);
+    return PRODUCTS.filter((p) => p.category === product.category && p.id !== product.id).slice(0, limit);
   }, []);
-
-  const getCartQty = useCallback(
-    (id) => {
-      const item = cart.find((i) => i.id === id);
-      return item ? item.qty : 0;
-    },
-    [cart]
-  );
+  const getCartQty = useCallback((id) => {
+    const item = cart.find((i) => i.id === id);
+    return item ? item.qty : 0;
+  }, [cart]);
 
   const value = {
-    // products
     products: PRODUCTS,
     getFilteredProducts,
     getProductById,
     getRelatedProducts,
-    // search
     searchQuery,
     setSearchQuery,
-    // cart
     cart,
     cartCount,
     cartSubtotal,
@@ -278,15 +264,17 @@ export const AppProvider = ({ children }) => {
     getCartQty,
     isCartOpen,
     setIsCartOpen,
-    // wishlist
     wishlist,
     toggleWishlist,
     isInWishlist,
-    // auth
     user,
     login,
     signup,
     logout,
+    orders,
+    placeOrder,
+    savedAddresses,
+    deleteAddress,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
