@@ -62,37 +62,52 @@ GreenCart is a modern grocery e-commerce web application built using React.js, C
 
 ## 📸 Application Screenshots
 
-### 🏠 Home Page
+<table>
+<tr>
+<td align="center">
+<img src="screenshots/home.jpeg" width="400"/><br/>
+<b>Home Page</b>
+</td>
+<td align="center">
+<img src="screenshots/products.jpeg" width="400"/><br/>
+<b>Products Page</b>
+</td>
+</tr>
 
-![Home Page](screenshots/home.jpeg)
+<tr>
+<td align="center">
+<img src="screenshots/review order.jpeg" width="400"/><br/>
+<b>Review Order</b>
+</td>
+<td align="center">
+<img src="screenshots/checkout.jpeg" width="400"/><br/>
+<b>Checkout</b>
+</td>
+</tr>
 
-### 🛍 Products Page
+<tr>
+<td align="center">
+<img src="screenshots/payment.jpeg" width="400"/><br/>
+<b>Payment</b>
+</td>
+<td align="center">
+<img src="screenshots/confirmation.jpeg" width="400"/><br/>
+<b>Order Confirmation</b>
+</td>
+</tr>
 
-![Products Page](screenshots/products.jpeg)
+<tr>
+<td align="center">
+<img src="screenshots/profile_user.jpeg" width="400"/><br/>
+<b>User Profile</b>
+</td>
+<td align="center">
+<img src="screenshots/orders list.jpeg" width="400"/><br/>
+<b>Orders History</b>
+</td>
+</tr>
+</table>
 
-### 📋 Review Order
-
-![Review Order](screenshots/review%20order.jpeg)
-
-### 💳 Checkout
-
-![Checkout](screenshots/checkout.jpeg)
-
-### 💰 Payment
-
-![Payment](screenshots/payment.jpeg)
-
-### ✅ Order Confirmation
-
-![Order Confirmation](screenshots/confirmation.jpeg)
-
-### 👤 User Profile
-
-![User Profile](screenshots/profile_user.jpeg)
-
-### 📦 Orders History
-
-![Orders History](screenshots/orders%20list.jpeg)
 
 ---
 
