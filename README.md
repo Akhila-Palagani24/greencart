@@ -1,65 +1,161 @@
-HEAD
-# 🛒 GreenCart – Fresh Grocery E-Commerce App
+# 🛒 GreenCart – Grocery E-Commerce Web Application
 
-A full-featured grocery e-commerce web app built with **React 18**, **Tailwind CSS 3**, and **React Router v6**.
+🚀 **Live Demo:** https://greencart-olive-ten.vercel.app/
+
+💻 **GitHub Repository:** https://github.com/Akhila-Palagani24/greencart
+
+---
+
+## 📌 Overview
+
+GreenCart is a modern grocery e-commerce web application built using React.js, Context API, React Router, and Tailwind CSS. The platform enables users to browse products, search items, manage their cart and wishlist, complete checkout, manage addresses, and view order history through a responsive and user-friendly interface.
+
+---
+
+## ✨ Features
+
+### 🏠 Home Page
+
+* Modern responsive homepage
+* Hero banner with promotional offers
+* Featured product sections
+* Category browsing
+
+### 🛍 Shopping Experience
+
+* Product listing page
+* Category-based filtering
+* Product search functionality
+* Product detail page
+* Related product suggestions
+
+### 🛒 Cart & Wishlist
+
+* Add products to cart
+* Quantity management
+* Remove products from cart
+* Wishlist functionality
+* Local storage persistence
+
+### 📦 Checkout System
+
+* Multi-step checkout process
+* Order review page
+* Address management
+* Payment method selection
+* Order confirmation screen
+
+### 👤 User Account
+
+* Login and signup interface
+* Profile management
+* Saved addresses
+* Order history tracking
+
+### 📱 Responsive Design
+
+* Mobile-friendly layout
+* Tablet support
+* Desktop optimized UI
+
+---
+
+## 📸 Application Screenshots
+
+### 🏠 Home Page
+
+![Home Page](screenshots/home.jpeg)
+
+### 🛍 Products Page
+
+![Products Page](screenshots/products.jpeg)
+
+### 📋 Review Order
+
+![Review Order](screenshots/review%20order.jpeg)
+
+### 💳 Checkout
+
+![Checkout](screenshots/checkout.jpeg)
+
+### 💰 Payment
+
+![Payment](screenshots/payment.jpeg)
+
+### ✅ Order Confirmation
+
+![Order Confirmation](screenshots/confirmation.jpeg)
+
+### 👤 User Profile
+
+![User Profile](screenshots/profile_user.jpeg)
+
+### 📦 Orders History
+
+![Orders History](screenshots/orders%20list.jpeg)
+
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+
+* React 18
+* React Router DOM
+* Context API
+* Tailwind CSS
+* React Hot Toast
+* React Icons
+
+### Deployment & Tools
+
+* GitHub
+* Vercel
+* LocalStorage
 
 ---
 
 ## 📁 Project Structure
 
-```
-greencart/
-├── public/
-│   └── index.html
-├── src/
-│   ├── components/
-│   │   ├── cart/
-│   │   │   └── CartSidebar.jsx        # Slide-in cart drawer
-│   │   ├── checkout/
-│   │   │   └── CheckoutPage.jsx       # 4-step checkout flow
-│   │   ├── home/
-│   │   │   └── HomePage.jsx           # Hero, categories, featured products
-│   │   ├── layout/
-│   │   │   ├── Navbar.jsx             # Fixed top navbar with search
-│   │   │   └── Footer.jsx             # Footer with links + newsletter
-│   │   └── product/
-│   │       ├── ProductCard.jsx        # Reusable product card
-│   │       ├── ShopPage.jsx           # Product listing with filters
-│   │       └── ProductDetailPage.jsx  # Full product detail view
-│   ├── context/
-│   │   └── AppContext.jsx             # Global state (cart, search, wishlist)
-│   ├── data/
-│   │   └── products.js                # 28 mock products across 7 categories
-│   ├── pages/
-│   │   ├── AccountPage.jsx            # Auth + profile
-│   │   └── WishlistPage.jsx           # Saved products
-│   ├── App.jsx                        # Router + layout setup
-│   ├── index.js                       # React entry point
-│   └── index.css                      # Tailwind + custom styles
-├── tailwind.config.js
-├── postcss.config.js
-└── package.json
+```text
+src/
+├── components/
+│   ├── cart/
+│   ├── checkout/
+│   ├── home/
+│   ├── layout/
+│   └── product/
+├── context/
+│   └── AppContext.jsx
+├── data/
+│   └── products.js
+├── pages/
+├── App.jsx
+├── index.js
+└── index.css
 ```
 
----
+## 🚀 Installation
 
-## 🚀 Getting Started
+Clone the repository:
 
-### 1. Install dependencies
+```bash
+git clone https://github.com/Akhila-Palagani24/greencart.git
+```
+
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-### 2. Start development server
+Run the project locally:
 
 ```bash
 npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### 3. Build for production
+Build for production:
 
 ```bash
 npm run build
@@ -67,70 +163,37 @@ npm run build
 
 ---
 
-## ✨ Features
+## 🌐 Live Deployment
 
-| Feature | Details |
-|---|---|
-| **Homepage** | Auto-rotating hero banner, category grid, featured/organic/fresh product sections, testimonials |
-| **Shop Page** | Category filter sidebar (desktop), horizontal tabs (mobile), sort options, search results |
-| **Product Detail** | Full info, quantity selector, add to cart / buy now, wishlist, related products |
-| **Cart Sidebar** | Slide-in drawer, quantity controls, delivery progress bar, totals |
-| **Checkout** | 4-step flow: Review → Address → Payment → Confirmation |
-| **Wishlist** | Heart toggle on all cards, dedicated wishlist page |
-| **Account** | Mock login/signup, profile editor, orders & addresses tabs |
-| **Search** | Full-text search across name, category, description |
-| **Persistence** | Cart + wishlist saved in localStorage |
+The application is deployed on Vercel:
+
+https://greencart-olive-ten.vercel.app/
 
 ---
 
-## 🛠 Tech Stack
+## 🎯 Future Enhancements
 
-- **React 18** – hooks (useReducer, useContext, useEffect, useState)
-- **React Router v6** – file-based routing with URL param sync
-- **Tailwind CSS 3** – utility-first responsive styling
-- **Context API** – global state (no Redux needed)
-- **react-hot-toast** – toast notifications
-- **LocalStorage** – client-side persistence
-
----
-
-## 📦 Mock Data
-
-`src/data/products.js` contains:
-- **28 products** across 7 categories (Fruits, Vegetables, Dairy, Bakery, Snacks, Beverages, Organic)
-- Each product has: name, price, originalPrice, unit, stock, rating, reviews, image, badge, description, tags
-- 3 hero banner slides
-- 4 feature highlights
-- 3 customer testimonials
+* Node.js + Express Backend
+* MongoDB Database Integration
+* JWT Authentication
+* Razorpay Payment Gateway
+* Real Order Tracking
+* Admin Dashboard
+* Product Reviews & Ratings
+* Email Notifications
 
 ---
 
-## 🎨 Design Tokens
+## 👩‍💻 Developer
 
-| Token | Value |
-|---|---|
-| Primary green | `#16a34a` (Tailwind `primary-600`) |
-| Accent orange | `#FF6B35` |
-| Font | Inter (Google Fonts) |
-| Card radius | `1rem` (rounded-2xl) |
-| Card shadow | `shadow-sm` with `hover:shadow-lg` |
+**Akhila Palagani**
+
+Computer Science Undergraduate passionate about Full Stack Development, React.js, AI Applications, and Software Engineering.
+
+🔗 GitHub: https://github.com/Akhila-Palagani24
 
 ---
 
-## 🔌 Backend / API Integration
+## ⭐ Support
 
-This project uses mock data. To connect a real backend:
-
-1. Replace `src/data/products.js` exports with `fetch()` calls to your API
-2. Update `AppContext.jsx` → replace `PRODUCTS` import with async data fetching
-3. Add a `useEffect` + loading/error states to `ShopPage` and `HomePage`
-4. Wire the checkout form to a real payment gateway (Razorpay, Stripe, etc.)
-
-Example API swap in `AppContext.jsx`:
-```js
-useEffect(() => {
-  fetch('/api/products')
-    .then(r => r.json())
-    .then(data => setProducts(data));
-}, []);
-```
+If you found this project useful, please consider giving it a ⭐ on GitHub.
